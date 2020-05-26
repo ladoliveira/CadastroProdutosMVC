@@ -1,0 +1,110 @@
+﻿@model CadastroProdutos.Models.ProdutoViewModel
+
+<h1>New Product</h1>
+<hr />
+@using (Html.BeginForm("Create", "Produtos", FormMethod.Post, new { enctype = "multipart/form-data", id = "formImputs" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Nome, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Nome,
+                                   new { @class = "form-control", @placeholder = "Nome do produto", id = "iNome" })
+                @Html.ValidationMessageFor(m => m.Nome, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Descricao, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Descricao,
+                                   new { @class = "form-control", @placeholder = "Descrição do produto", id = "iDescricao" })
+                @Html.ValidationMessageFor(m => m.Descricao, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Preco, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Preco,
+                                   new { @class = "form-control", @placeholder = "Preço do produto", id = "iPreco" })
+                @Html.ValidationMessageFor(m => m.Preco, "", new { @class = "text-danger", id = "idSpan" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CategoriaId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(m => m.CategoriaId,
+                                   new SelectList(ViewBag.Categorias, "CategoriaId", "CategoriaNome"),
+                                   "Escolha a categoria", new { @class = "form-control", id = "iCategoria" })
+                @Html.ValidationMessageFor(m => m.CategoriaId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.ImageUpload, new { @class = "control-label col-md-2" })
+            <div class="col-md-10" id="div1">
+                @Html.TextBoxFor(m => m.ImageUpload, new { type = "file", @class = "form-control", id = "iMagem", onchange = "mudaFoco()" })
+                @Html.ValidationMessageFor(m => m.ImageUpload, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Salvar Produto" class="btn btn-success" id="teste" onclick="validar()" />
+                @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-danger", id = "idSpan" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/validations_pt-br")
+    <link href="~/Sweet/sweetalert.css" rel="stylesheet" />
+    <script src="~/Sweet/sweetalert.min.js"></script>
+    <script type="text/javascript">
+
+
+        $('#iPreco').on('keypress', function () {
+            var regex = new RegExp("^[ 0-9\b.,]+$");
+            var _this = this;
+            setTimeout(function () {
+                var texto = $(_this).val();
+                if (!regex.test(texto)) {
+                    setTimeout(()=>$(_this).val(texto.substring(0, (texto.length - 1))),100);
+                    $('#teste').focus();
+                    $('#iPreco').focus();
+                }
+            }, 100);
+        });
+
+        function mudaFoco() {
+            $('#teste').focus();
+        }
+
+        function validar() {
+            var nome = $('#iNome').val();
+            var descricao = $('#iDescricao').val();
+            var preco = $('#iPreco').val();
+            var categoria = $('#iCategoria').val();
+            var files = $('#iMagem')[0].files[0];
+            var span = $('#idSpan').contents().text();
+
+            if (preco != "" && span == ""  && nome != "" && descricao != "" && categoria != "" && files != null) {
+                event.preventDefault();
+                swal({
+                    title: 'Confirmado!',
+                    text: 'Registro criado com sucesso.',
+                    type: 'success',
+                    confirmButtonClass: 'btn-primary',
+                    confirmButtonText: "OK"
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $("#teste").prop("type", "submit").attr("onclick", false).click();
+                    }
+
+                });
+            }
+
+        }
+    </script>
+}
+
